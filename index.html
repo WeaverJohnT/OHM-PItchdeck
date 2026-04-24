@@ -223,8 +223,11 @@
   #videos { background: #fff; }
 
   .video-grid {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    display: grid; grid-template-columns: repeat(2, 1fr);
     gap: 2.5rem;
+  }
+  @media (max-width: 700px) {
+    .video-grid { grid-template-columns: 1fr; }
   }
   .video-card {
     background: var(--cream);
@@ -572,11 +575,22 @@
           <p class="video-desc">We have done it before — and we will do it again. This is what your vacant property can become.</p>
         </div>
       </div>
+      <div class="video-card reveal">
+        <div class="video-wrapper">
+          <video controls preload="none"
+            src="https://ohmhawaii.com/wp-content/uploads/2026/04/Nico-Security-KHON2.mp4">
+          </video>
+        </div>
+        <div class="video-info">
+          <span class="video-tag">News Coverage · KHON2</span>
+          <div class="video-title">Inside the Marketplace</div>
+          <p class="video-desc">KHON2 news takes you inside — vendor interviews, booth tours, wide shots of the floor, and a close look at the finished product in action.</p>
+        </div>
+      </div>
+
     </div>
   </div>
 </section>
-
-<!-- ── QUICK OVERVIEW WITH KEY POINTS ── -->
 <section id="overview">
   <div class="container">
     <div class="overview-inner">
