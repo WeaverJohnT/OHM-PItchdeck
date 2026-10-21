@@ -308,7 +308,7 @@
   }
   @media (max-width: 768px) { .community-inner { grid-template-columns: 1fr; } }
   .community-text { order: 1; }
-  .community-video { order: 2; border-radius: 4px; overflow: hidden; border: 1px solid rgba(201,168,76,0.3); }
+  .community-video { order: 2; border-radius: 4px; overflow: hidden; border: 1px solid rgba(201,168,76,0.3); width: 100%; max-width: 360px; justify-self: center; background: #000; }
   .community-video video { width: 100%; display: block; }
   .community-text .section-eyebrow { text-align: left; }
   .community-text .section-title { text-align: left; font-size: clamp(1.5rem, 3vw, 2.4rem); }
@@ -375,6 +375,27 @@
   #contact .section-title { color: #fff; }
   #contact .section-lead { color: rgba(255,255,255,0.55); }
   .contact-wrap { text-align: center; }
+
+  .contact-form { text-align: left; }
+  .contact-form input[type="text"], .contact-form input[type="email"], .contact-form input[type="tel"], .contact-form textarea {
+    width: 100%; padding: .85rem 1rem; margin-bottom: 1rem; box-sizing: border-box;
+    background: rgba(255,255,255,0.06); border: 1px solid rgba(201,168,76,0.25); border-radius: 4px;
+    color: #fff; font: inherit; font-size: .95rem;
+  }
+  .contact-form ::placeholder { color: rgba(255,255,255,0.45); }
+  .contact-form input:focus, .contact-form textarea:focus { outline: none; border-color: var(--gold); background: rgba(255,255,255,0.1); }
+  .contact-form textarea { resize: vertical; min-height: 120px; }
+  .cf-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  @media (max-width: 600px) { .cf-row { grid-template-columns: 1fr; gap: 0; } }
+  .contact-form button {
+    width: 100%; padding: 1rem; background: var(--gold); color: #1a1208; font-weight: 700; font-size: 1rem;
+    border: none; border-radius: 4px; cursor: pointer; letter-spacing: .05em; text-transform: uppercase; transition: background .2s, transform .2s;
+  }
+  .contact-form button:hover:not(:disabled) { background: var(--gold-light); transform: translateY(-2px); }
+  .contact-form button:disabled { opacity: .6; cursor: wait; }
+  #form-result { margin: 1rem 0 0; text-align: center; min-height: 1.2em; }
+  #form-result.ok { color: var(--gold-light); }
+  #form-result.err { color: #ff9c8a; }
   .contact-cta {
     display: inline-block; margin-top: 2rem;
     padding: 1.1rem 3rem;
@@ -666,7 +687,7 @@
         </ul>
       </div>
       <div class="community-video reveal">
-        <div style="position:relative;padding-bottom:56.25%;"><iframe src="https://customer-5zmi1mg85pfoj0pj.cloudflarestream.com/e165b37227f57771ff90240979ec697d/iframe?poster=https://customer-5zmi1mg85pfoj0pj.cloudflarestream.com/e165b37227f57771ff90240979ec697d/thumbnails/thumbnail.jpg%3Ftime%3D%26height%3D600" loading="lazy" style="border:none;position:absolute;top:0;left:0;width:100%;height:100%;" allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture;" allowfullscreen="true"></iframe></div>
+        <div style="position:relative;padding-bottom:177.78%;"><iframe src="https://customer-5zmi1mg85pfoj0pj.cloudflarestream.com/e165b37227f57771ff90240979ec697d/iframe?poster=https://customer-5zmi1mg85pfoj0pj.cloudflarestream.com/e165b37227f57771ff90240979ec697d/thumbnails/thumbnail.jpg%3Ftime%3D%26height%3D600" loading="lazy" style="border:none;position:absolute;top:0;left:0;width:100%;height:100%;" allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture;" allowfullscreen="true"></iframe></div>
       </div>
     </div>
   </div>
@@ -835,19 +856,50 @@
         a department store, a large mall vacancy — we would love to explore a partnership
         with you. No obligation, just a conversation.
       </p>
-      <div class="reveal" style="max-width: 720px; margin: 2rem auto 0; background: rgba(255,255,255,0.04); border: 1px solid rgba(201,168,76,0.2); border-radius: 4px; padding: 2rem 2rem 0.5rem; overflow: hidden;">
-        <iframe
-          id="JotFormIFrame-261058475132152"
-          title="Landlord, Property Owner, Commercial Agent (Contact Form)"
-          allowtransparency="true"
-          allow="geolocation; microphone; camera; fullscreen; payment"
-          src="https://form.jotform.com/261058475132152"
-          frameborder="0"
-          style="min-width:100%; max-width:100%; height:539px; border:none; background:transparent;"
-          scrolling="no"
-        ></iframe>
-        <script src='https://cdn.jotfor.ms/s/umd/latest/for-form-embed-handler.js'></script>
-        <script>window.jotformEmbedHandler("iframe[id='JotFormIFrame-261058475132152']", "https://form.jotform.com/")</script>
+      <div class="reveal" style="max-width: 720px; margin: 2rem auto 0; background: rgba(255,255,255,0.04); border: 1px solid rgba(201,168,76,0.2); border-radius: 4px; padding: 2rem;">
+        <form id="contact-form" class="contact-form" action="https://api.web3forms.com/submit" method="POST">
+          <input type="hidden" name="access_key" value="dcf78723-f2d5-4e34-bc23-6de7602ee6c7">
+          <input type="hidden" name="subject" value="New Landlord Inquiry – OHM Hawaii Pitchdeck">
+          <input type="hidden" name="from_name" value="OHM Hawaii Pitchdeck">
+          <input type="checkbox" name="botcheck" tabindex="-1" autocomplete="off" style="display:none;">
+          <div class="cf-row">
+            <input type="text" name="first_name" placeholder="First Name" aria-label="First Name" required>
+            <input type="text" name="last_name" placeholder="Last Name" aria-label="Last Name" required>
+          </div>
+          <input type="text" name="company" placeholder="Company / Organization" aria-label="Company or Organization">
+          <input type="text" name="property_address" placeholder="Property Address" aria-label="Property Address">
+          <input type="text" name="sqft" placeholder="Approximate Square Footage" aria-label="Approximate Square Footage">
+          <div class="cf-row">
+            <input type="email" name="email" placeholder="Email Address" aria-label="Email Address" required>
+            <input type="tel" name="phone" placeholder="Phone (optional)" aria-label="Phone">
+          </div>
+          <textarea name="message" placeholder="Tell us about your property…" aria-label="Message" rows="5"></textarea>
+          <button type="submit" id="cf-submit">Send Message</button>
+          <p id="form-result" role="status" aria-live="polite"></p>
+        </form>
+        <script>
+          document.getElementById('contact-form').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const form = e.target, btn = document.getElementById('cf-submit'), out = document.getElementById('form-result');
+            btn.disabled = true; btn.textContent = 'Sending…'; out.className = ''; out.textContent = '';
+            try {
+              const res = await fetch('https://api.web3forms.com/submit', { method: 'POST', body: new FormData(form), headers: { 'Accept': 'application/json' } });
+              const json = await res.json();
+              if (json.success) {
+                form.reset();
+                out.className = 'ok';
+                out.textContent = 'Thank you! We will be in touch within 24 hours.';
+              } else {
+                throw new Error(json.message || 'Submission failed');
+              }
+            } catch (err) {
+              out.className = 'err';
+              out.textContent = 'Sorry, something went wrong. Please try again or contact us at OHMHawaii.com.';
+            } finally {
+              btn.disabled = false; btn.textContent = 'Send Message';
+            }
+          });
+        </script>
       </div>
       <div class="contact-info-row reveal">
         <div class="contact-info-item">
