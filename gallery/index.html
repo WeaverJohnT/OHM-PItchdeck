@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Photo Gallery — Ohana Hale Marketplace</title>
+  <meta name="description" content="Hundreds of photos of Ohana Hale Marketplace — facility buildout, vendors, restaurants, community events, marketing and more.">
+  <link rel="icon" type="image/png" href="https://ohmhawaii.com/wp-content/uploads/2026/04/500-x-500-OHM-Logo-Internal-Shadow.png">
+
+  <!-- Fonts (same as pitch deck) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+  <style>
+    /* ─── Design Tokens (match pitch deck) ─── */
+    :root {
+      --gold:   #C9A84C;
+      --gold-lt: #E2C882;
+      --deep:   #1A1208;
+      --cream:  #FAF6EE;
+      --ocean:  #1B4B5A;
+      --warm:   #2C1F0E;
+      --text:   #3A2C1A;
+      --muted:  #7A6A52;
+
+      --font-heading: 'Playfair Display', Georgia, serif;
+      --font-accent:  'Cinzel', serif;
+      --font-italic:  'Cormorant Garamond', Georgia, serif;
+      --font-body:    'Montserrat', sans-serif;
+
+      --ease-out: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    /* ─── Reset ─── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--deep);
+      color: var(--cream);
+      font-family: var(--font-body);
+      font-size: 16px;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* ─── Scroll Progress Bar ─── */
+    #scroll-progress {
+      position: fixed;
+      top: 0; left: 0;
+      height: 3px;
+      width: 0%;
+      background: linear-gradient(90deg, var(--gold), var(--gold-lt));
+      z-index: 1000;
+      transition: width 0.1s linear;
+    }
+
+    /* ─── Navigation ─── */
+    nav {
+      position: fixed;
+      top: 3px; left: 0; right: 0;
+      z-index: 900;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 2.5rem;
+      transition: background 0.4s var(--ease-out), box-shadow 0.4s;
+    }
+    nav.scrolled {
+      background: rgba(26, 18, 8, 0.94);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 1px 0 rgba(201, 168, 76, 0.2);
+    }
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+    }
+    .nav-brand img {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    .nav-brand span {
+      font-family: var(--font-accent);
+      font-size: 0.88rem;
+      letter-spacing: 0.18em;
+      color: var(--gold);
+      text-transform: uppercase;
+    }
+    .nav-back {
+      font-family: var(--font-accent);
+      font-size: 0.72rem;
+      letter-spacing: 0.22em;
+      color: var(--gold);
+      text-decoration: none;
+      text-transform: uppercase;
+      border: 1px solid rgba(201,168,76,0.4);
+      padding: 0.45rem 1.1rem;
+      border-radius: 2px;
+      transition: background 0.25s, border-color 0.25s, color 0.25s;
+    }
+    .nav-back:hover {
+      background: var(--gold);
+      color: var(--deep);
+      border-color: var(--gold);
+    }
+
+    /* ─── Hero Header ─── */
+    .gallery-hero {
+      padding: 9rem 2rem 4rem;
+      text-align: center;
+      background: radial-gradient(ellipse at center top, rgba(201,168,76,0.12) 0%, transparent 65%);
+      border-bottom: 1px solid rgba(201,168,76,0.15);
+    }
+    .gallery-hero .eyebrow {
+      font-family: var(--font-accent);
+      font-size: 0.72rem;
+      letter-spacing: 0.32em;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+      opacity: 0;
+      animation: fadeUp 0.8s var(--ease-out) 0.2s forwards;
+    }
+    .gallery-hero h1 {
+      font-family: var(--font-heading);
+      font-size: clamp(2.2rem, 5vw, 3.8rem);
+      font-weight: 700;
+      color: var(--cream);
+      line-height: 1.15;
+      margin-bottom: 1.2rem;
+      opacity: 0;
+      animation: fadeUp 0.9s var(--ease-out) 0.35s forwards;
+    }
+    .gallery-hero h1 em {
+      font-style: italic;
+      color: var(--gold);
+    }
+    .gallery-hero p {
+      font-family: var(--font-italic);
+      font-size: clamp(1.05rem, 2vw, 1.3rem);
+      color: rgba(250,246,238,0.72);
+      max-width: 640px;
+      margin: 0 auto 2.5rem;
+      opacity: 0;
+      animation: fadeUp 0.9s var(--ease-out) 0.5s forwards;
+    }
+
+    /* ─── Filter Bar ─── */
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.6rem;
+      padding: 0 1rem 0;
+      opacity: 0;
+      animation: fadeUp 0.8s var(--ease-out) 0.65s forwards;
+    }
+    .filter-btn {
+      font-family: var(--font-accent);
+      font-size: 0.68rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      padding: 0.5rem 1.2rem;
+      border: 1px solid rgba(201,168,76,0.35);
+      background: transparent;
+      color: rgba(250,246,238,0.7);
+      border-radius: 2px;
+      cursor: pointer;
+      transition: all 0.25s;
+    }
+    .filter-btn:hover,
+    .filter-btn.active {
+      background: var(--gold);
+      color: var(--deep);
+      border-color: var(--gold);
+    }
+
+    /* ─── Gallery Grid ─── */
+    .gallery-section {
+      padding: 3rem 1.5rem 5rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .gallery-grid {
+      columns: 4;
+      column-gap: 1rem;
+    }
+    @media (max-width: 1100px) { .gallery-grid { columns: 3; } }
+    @media (max-width: 720px)  { .gallery-grid { columns: 2; } }
+    @media (max-width: 420px)  { .gallery-grid { columns: 1; } }
+
+    .gallery-item {
+      break-inside: avoid;
+      margin-bottom: 1rem;
+      border-radius: 4px;
+      overflow: hidden;
+      position: relative;
+      cursor: pointer;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s var(--ease-out), transform 0.5s var(--ease-out);
+    }
+    .gallery-item.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .gallery-item img {
+      width: 100%;
+      display: block;
+      transition: transform 0.5s var(--ease-out);
+      border-radius: 4px;
+    }
+    .gallery-item:hover img {
+      transform: scale(1.04);
+    }
+    .gallery-item::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(26,18,8,0.6) 0%, transparent 50%);
+      opacity: 0;
+      transition: opacity 0.3s;
+      border-radius: 4px;
+    }
+    .gallery-item:hover::after {
+      opacity: 1;
+    }
+    .gallery-item .zoom-icon {
+      position: absolute;
+      bottom: 0.8rem;
+      right: 0.8rem;
+      width: 32px;
+      height: 32px;
+      background: rgba(201,168,76,0.85);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transform: scale(0.8);
+      transition: opacity 0.3s, transform 0.3s var(--ease-spring);
+    }
+    .gallery-item:hover .zoom-icon {
+      opacity: 1;
+      transform: scale(1);
+    }
+    .zoom-icon svg { width: 14px; height: 14px; fill: var(--deep); }
+
+    /* hidden items */
+    .gallery-item[data-hidden="true"] {
+      display: none;
+    }
+
+    /* ─── Lightbox ─── */
+    #lightbox {
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 7, 3, 0.96);
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s var(--ease-out);
+    }
+    #lightbox.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+    .lb-inner {
+      position: relative;
+      max-width: min(90vw, 1100px);
+      max-height: 90vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #lb-img {
+      max-width: 100%;
+      max-height: 85vh;
+      object-fit: contain;
+      border-radius: 4px;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.7);
+      transform: scale(0.92);
+      transition: transform 0.35s var(--ease-spring);
+    }
+    #lightbox.open #lb-img {
+      transform: scale(1);
+    }
+    .lb-close {
+      position: fixed;
+      top: 1.5rem;
+      right: 1.5rem;
+      width: 44px;
+      height: 44px;
+      background: rgba(201,168,76,0.15);
+      border: 1px solid rgba(201,168,76,0.4);
+      border-radius: 50%;
+      color: var(--gold);
+      font-size: 1.4rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.25s;
+      line-height: 1;
+    }
+    .lb-close:hover { background: rgba(201,168,76,0.35); }
+    .lb-nav {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 48px;
+      height: 48px;
+      background: rgba(201,168,76,0.15);
+      border: 1px solid rgba(201,168,76,0.35);
+      border-radius: 50%;
+      color: var(--gold);
+      font-size: 1.3rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.25s;
+      user-select: none;
+    }
+    .lb-nav:hover { background: rgba(201,168,76,0.3); }
+    .lb-prev { left: 1.2rem; }
+    .lb-next { right: 1.2rem; }
+    .lb-counter {
+      position: fixed;
+      bottom: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: var(--font-accent);
+      font-size: 0.68rem;
+      letter-spacing: 0.2em;
+      color: rgba(201,168,76,0.6);
+    }
+
+    /* ─── Category labels ─── */
+    .category-label {
+      font-family: var(--font-accent);
+      font-size: 0.7rem;
+      letter-spacing: 0.28em;
+      color: var(--gold);
+      text-transform: uppercase;
+      text-align: center;
+      margin: 3rem 0 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+    .category-label::before,
+    .category-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(to right, transparent, rgba(201,168,76,0.3), transparent);
+    }
+
+    /* ─── CTA ─── */
+    .gallery-cta {
+      text-align: center;
+      padding: 2rem 1rem 5rem;
+      border-top: 1px solid rgba(201,168,76,0.12);
+    }
+    .gallery-cta p {
+      font-family: var(--font-italic);
+      font-size: 1.2rem;
+      color: rgba(250,246,238,0.65);
+      margin-bottom: 1.8rem;
+    }
+    .btn-gold {
+      display: inline-block;
+      font-family: var(--font-accent);
+      font-size: 0.72rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: var(--deep);
+      background: var(--gold);
+      padding: 1rem 2.5rem;
+      border-radius: 2px;
+      transition: background 0.25s, transform 0.25s;
+    }
+    .btn-gold:hover { background: var(--gold-lt); transform: translateY(-2px); }
+
+    /* ─── Footer ─── */
+    footer {
+      background: var(--warm);
+      text-align: center;
+      padding: 2rem;
+      font-family: var(--font-accent);
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      color: rgba(201,168,76,0.45);
+      text-transform: uppercase;
+    }
+
+    /* ─── Keyframes ─── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Scroll progress -->
+  <div id="scroll-progress"></div>
+
+  <!-- Nav -->
+  <nav id="main-nav">
+    <a class="nav-brand" href="../index.html">
+      <img src="https://ohmhawaii.com/wp-content/uploads/2026/04/500-x-500-OHM-Logo-Internal-Shadow.png" alt="OHM Hawaii Logo">
+      <span>Ohana Hale Marketplace</span>
+    </a>
+    <a class="nav-back" href="../index.html">← Back to Proposal</a>
+  </nav>
+
+  <!-- Hero -->
+  <header class="gallery-hero">
+    <p class="eyebrow">Visual Portfolio</p>
+    <h1>See <em>What We Build</em></h1>
+    <p>Facility buildout, vendor stalls, restaurants, community events, marketing activations, and the energy that fills every square foot.</p>
+
+    <!-- Filter buttons -->
+    <div class="filter-bar">
+      <button class="filter-btn active" data-filter="all">All Photos</button>
+      <button class="filter-btn" data-filter="buildout">Facility Buildout</button>
+      <button class="filter-btn" data-filter="vendors">Vendors &amp; Shops</button>
+      <button class="filter-btn" data-filter="restaurants">Restaurants</button>
+      <button class="filter-btn" data-filter="events">Community Events</button>
+      <button class="filter-btn" data-filter="marketing">Marketing</button>
+    </div>
+  </header>
+
+  <!-- Gallery Grid -->
+  <main class="gallery-section">
+    <div class="gallery-grid" id="gallery-grid">
+
+      <!--
+        Images are served from the gallery/ subfolder next to this file.
+        Categories are assigned to give the filter feature life;
+        adjust as photos are better identified.
+      -->
+
+      <div class="gallery-item" data-category="buildout" data-index="0">
+        <img src="gallery/gallery-1.jpg" alt="OHM Hawaii Facility" loading="lazy">
+        <div class="zoom-icon"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14zM12 10h-2v2H9v-2H7V9h2V7h1v2h2v1z"/></svg></div>
+      </div>
+
+      <div class="gallery-item" data-category="vendors" data-index="1">
+        <img src="gallery/gallery-2.jpg" alt="OHM Hawaii Vendors" loading="lazy">
+        <div class="zoom-icon"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14zM12 10h-2v2H9v-2H7V9h2V7h1v2h2v1z"/></svg></div>
+      </div>
+
+      <div class="gallery-item" data-category="buildout" data-index="2">
+        <img src="gallery/gallery-3.jpg" alt="OHM Hawaii Space" loading="lazy">
+        <div class="zoom-icon"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14zM12 10h-2v2H9v-2H7V9h2V7h1v2h2v1z"/></svg></div>
+      </div>
+
+      <div class="gallery-item" data-category="restaurants" data-index="3">
+        <img src="gallery/gallery-4.jpg" alt="OHM Hawaii Dining" loading="lazy">
+        <div class="zoom-icon"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14zM12 10h-2v2H9v-2H7V9h2V7h1v2h2v1z"/></svg></div>
+      </div>
+
+      <div class="gallery-item" data-category="events" data-index="4">
+        <img src="gallery/gallery-5.jpg" alt="OHM Hawaii Event" loading="lazy">
+        <div class="zoom-icon"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14zM12 10h-2v2H9v-2H7V9h2V7h1v2h2v1z"/></svg></div>
+      </div>
+
+      <div class="gallery-item" data-category="buildout" data-index="5">
+        <img src="gallery/gallery-6.jpg" alt="OHM Hawaii Interior" loading="lazy">
+        <div class="zoom-icon"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14zM12 10h-2v2H9v-2H7V9h2V7h1v2h2v1z"/></svg></div>
+      </div>
+
+      <div class="gallery-item" data-category="vendors" data-index="6">
+        <img src="gallery/gallery-7.jpg" alt="OHM Hawaii Vendor Stalls" loading="lazy">
+        <div class="zoom-icon"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14zM12 10h-2v2H9v-2H7V9h2V7h1v2h2v1z"/></svg></div>
+      </div>
+
+      <div class="gallery-item" data-category="restaurants" data-index="7">
+        <img src="gallery/gallery-8.jpg" alt="OHM Hawaii Food" loading="lazy">
+        <div class="zoom-icon"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14zM12 10h-2v2H9v-2H7V9h2V7h1v2h2v1z"/></svg></div>
+      </div>
+
+      <div class="gallery-item" data-category="events" data-index="8">
+        <img src="gallery/gallery-10.jpg" alt="OHM Hawaii Community" loading="lazy">
+        <div class="zoom-icon"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14zM12 10h-2v2H9v-2H7V9h2V7h1v2h2v1z"/></svg></div>
+      </div>
+
+      <div class="gallery-item" data-category="buildout" data-index="9">
+        <img src="gallery/gallery-11.jpg" alt="OHM Hawaii Layout" loading="lazy">
+        <div class="zoom-icon"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14zM12 10h-2v2H9v-2H7V9h2V7h1v2h2v1z"/></svg></div>
+      </div>
+
+      <div class="gallery-item" data-category="vendors" data-index="10">
+        <img src="gallery/gallery-12-1.jpg" alt="OHM Hawaii Retail" loading="lazy">
+        <div class="zoom-icon"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14zM12 10h-2v2H9v-2H7V9h2V7h1v2h2v1z"/></svg></div>
+      </div>
+
+      <div class="gallery-item" data-category="marketing" data-index="11">
+        <img src="gallery/gallery-13.jpg" alt="OHM Hawaii Marketing" loading="lazy">
+        <div class="zoom-icon"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14zM12 10h-2v2H9v-2H7V9h2V7h1v2h2v1z"/></svg></div>
+      </div>
+
+      <div class="gallery-item" data-category="buildout" data-index="12">
+        <img src="gallery/gallery-15.jpg" alt="OHM Hawaii Construction" loading="lazy">
+        <div class="zoom-icon"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14zM12 10h-2v2H9v-2H7V9h2V7h1v2h2v1z"/></svg></div>
+      </div>
+
+      <div class="gallery-item" data-category="events" data-index="13">
+        <img src="gallery/gallery-17.jpg" alt="OHM Hawaii Live Event" loading="lazy">
+        <div class="zoom-icon"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14zM12 10h-2v2H9v-2H7V9h2V7h1v2h2v1z"/></svg></div>
+      </div>
+
+      <div class="gallery-item" data-category="restaurants" data-index="14">
+        <img src="gallery/gallery-18.jpg" alt="OHM Hawaii Restaurant Row" loading="lazy">
+        <div class="zoom-icon"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14zM12 10h-2v2H9v-2H7V9h2V7h1v2h2v1z"/></svg></div>
+      </div>
+
+      <div class="gallery-item" data-category="vendors" data-index="15">
+        <img src="gallery/gallery-19.jpg" alt="OHM Hawaii Booths" loading="lazy">
+        <div class="zoom-icon"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14zM12 10h-2v2H9v-2H7V9h2V7h1v2h2v1z"/></svg></div>
+      </div>
+
+      <div class="gallery-item" data-category="marketing" data-index="16">
+        <img src="gallery/gallery-21.jpg" alt="OHM Hawaii Signage" loading="lazy">
+        <div class="zoom-icon"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14zM12 10h-2v2H9v-2H7V9h2V7h1v2h2v1z"/></svg></div>
+      </div>
+
+      <div class="gallery-item" data-category="events" data-index="17">
+        <img src="gallery/gallery-22.jpg" alt="OHM Hawaii Gathering" loading="lazy">
+        <div class="zoom-icon"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14zM12 10h-2v2H9v-2H7V9h2V7h1v2h2v1z"/></svg></div>
+      </div>
+
+      <div class="gallery-item" data-category="buildout" data-index="18">
+        <img src="gallery/gallery-23.jpg" alt="OHM Hawaii Floor" loading="lazy">
+        <div class="zoom-icon"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14zM12 10h-2v2H9v-2H7V9h2V7h1v2h2v1z"/></svg></div>
+      </div>
+
+      <div class="gallery-item" data-category="vendors" data-index="19">
+        <img src="gallery/gallery-25.jpg" alt="OHM Hawaii Shopping" loading="lazy">
+        <div class="zoom-icon"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14zM12 10h-2v2H9v-2H7V9h2V7h1v2h2v1z"/></svg></div>
+      </div>
+
+      <div class="gallery-item" data-category="marketing" data-index="20">
+        <img src="gallery/gallery-26.jpg" alt="OHM Hawaii Promotion" loading="lazy">
+        <div class="zoom-icon"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14zM12 10h-2v2H9v-2H7V9h2V7h1v2h2v1z"/></svg></div>
+      </div>
+
+      <div class="gallery-item" data-category="events" data-index="21">
+        <img src="gallery/gallery-28.jpg" alt="OHM Hawaii Stage" loading="lazy">
+        <div class="zoom-icon"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14zM12 10h-2v2H9v-2H7V9h2V7h1v2h2v1z"/></svg></div>
+      </div>
+
+      <div class="gallery-item" data-category="restaurants" data-index="22">
+        <img src="gallery/gallery-29.jpg" alt="OHM Hawaii Cuisine" loading="lazy">
+        <div class="zoom-icon"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14zM12 10h-2v2H9v-2H7V9h2V7h1v2h2v1z"/></svg></div>
+      </div>
+
+      <div class="gallery-item" data-category="buildout" data-index="23">
+        <img src="gallery/gallery-30-1.jpg" alt="OHM Hawaii Wide Shot" loading="lazy">
+        <div class="zoom-icon"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14zM12 10h-2v2H9v-2H7V9h2V7h1v2h2v1z"/></svg></div>
+      </div>
+
+    </div><!-- /.gallery-grid -->
+  </main>
+
+  <!-- CTA -->
+  <section class="gallery-cta">
+    <p>Ready to discuss bringing Ohana Hale Marketplace to your space?</p>
+    <a class="btn-gold" href="../index.html#contact">Contact Our Team</a>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2026 Ohana Hale Marketplace &nbsp;·&nbsp; Oahu, Hawaii &nbsp;·&nbsp; ohmhawaii.com</p>
+  </footer>
+
+  <!-- Lightbox -->
+  <div id="lightbox" role="dialog" aria-modal="true" aria-label="Photo lightbox">
+    <div class="lb-inner">
+      <img id="lb-img" src="" alt="Gallery photo">
+    </div>
+    <button class="lb-close" aria-label="Close">&times;</button>
+    <button class="lb-nav lb-prev" aria-label="Previous photo">&#8592;</button>
+    <button class="lb-nav lb-next" aria-label="Next photo">&#8594;</button>
+    <div class="lb-counter" id="lb-counter"></div>
+  </div>
+
+  <script>
+    // ─── Scroll Progress ───
+    const prog = document.getElementById('scroll-progress');
+    const nav  = document.getElementById('main-nav');
+    window.addEventListener('scroll', () => {
+      const scrolled = window.scrollY;
+      const total = document.documentElement.scrollHeight - window.innerHeight;
+      prog.style.width = (scrolled / total * 100) + '%';
+      nav.classList.toggle('scrolled', scrolled > 40);
+    }, { passive: true });
+
+    // ─── Scroll Reveal ───
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e, i) => {
+        if (e.isIntersecting) {
+          setTimeout(() => e.target.classList.add('visible'), i * 60);
+          io.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.08 });
+    document.querySelectorAll('.gallery-item').forEach(el => io.observe(el));
+
+    // ─── Filter Buttons ───
+    const allItems = Array.from(document.querySelectorAll('.gallery-item'));
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const filter = btn.dataset.filter;
+        allItems.forEach(item => {
+          const show = filter === 'all' || item.dataset.category === filter;
+          item.style.display = show ? '' : 'none';
+        });
+        // re-observe newly shown items
+        allItems.forEach(item => {
+          if (item.style.display !== 'none' && !item.classList.contains('visible')) {
+            io.observe(item);
+          }
+        });
+        updateLightboxItems();
+      });
+    });
+
+    // ─── Lightbox ───
+    const lb       = document.getElementById('lightbox');
+    const lbImg    = document.getElementById('lb-img');
+    const lbCount  = document.getElementById('lb-counter');
+    let lbItems    = [];
+    let lbCurrent  = 0;
+
+    function updateLightboxItems() {
+      lbItems = allItems.filter(el => el.style.display !== 'none');
+    }
+    updateLightboxItems();
+
+    function openLb(idx) {
+      lbCurrent = idx;
+      const src = lbItems[idx].querySelector('img').src;
+      lbImg.src = src;
+      lbCount.textContent = (idx + 1) + ' / ' + lbItems.length;
+      lb.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeLb() {
+      lb.classList.remove('open');
+      document.body.style.overflow = '';
+      lbImg.src = '';
+    }
+    function navLb(dir) {
+      lbCurrent = (lbCurrent + dir + lbItems.length) % lbItems.length;
+      lbImg.style.opacity = '0';
+      setTimeout(() => {
+        lbImg.src = lbItems[lbCurrent].querySelector('img').src;
+        lbCount.textContent = (lbCurrent + 1) + ' / ' + lbItems.length;
+        lbImg.style.opacity = '1';
+      }, 150);
+    }
+
+    allItems.forEach((item, i) => {
+      item.addEventListener('click', () => {
+        updateLightboxItems();
+        const visibleIdx = lbItems.indexOf(item);
+        openLb(visibleIdx >= 0 ? visibleIdx : 0);
+      });
+    });
+
+    document.querySelector('.lb-close').addEventListener('click', closeLb);
+    document.querySelector('.lb-prev').addEventListener('click', () => navLb(-1));
+    document.querySelector('.lb-next').addEventListener('click', () => navLb(1));
+    lb.addEventListener('click', e => { if (e.target === lb) closeLb(); });
+
+    document.addEventListener('keydown', e => {
+      if (!lb.classList.contains('open')) return;
+      if (e.key === 'Escape') closeLb();
+      if (e.key === 'ArrowLeft') navLb(-1);
+      if (e.key === 'ArrowRight') navLb(1);
+    });
+
+    // touch swipe
+    let tsX = null;
+    lb.addEventListener('touchstart', e => { tsX = e.touches[0].clientX; });
+    lb.addEventListener('touchend', e => {
+      if (tsX === null) return;
+      const dx = e.changedTouches[0].clientX - tsX;
+      if (Math.abs(dx) > 50) navLb(dx < 0 ? 1 : -1);
+      tsX = null;
+    });
+  </script>
+</body>
+</html>
